@@ -89,3 +89,4 @@ Reportes generados:
 ## Documentación
 
 El análisis técnico completo de las pruebas y de seguridad está en [`INFORME.md`](INFORME.md).
+# minimarket
