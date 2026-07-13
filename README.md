@@ -6,6 +6,7 @@ Sistema backend para la gestión de un minimarket (productos, inventario, ventas
 
 - Java 17 · Spring Boot 3.4.1
 - Spring Web · Spring Data JPA · Spring Security
+- **Spring HATEOAS** (enlaces dinámicos) · **springdoc-openapi / Swagger UI** (documentación)
 - Base de datos en memoria H2
 - Lombok
 - Maven (con wrapper `mvnw`)
@@ -58,12 +59,32 @@ Requisitos: JDK 17 instalado.
 ./mvnw spring-boot:run
 ```
 
+Al iniciar se cargan datos demo (usuarios, roles y productos).
+
+**Credenciales demo:**
+
+| Usuario | Contraseña | Rol |
+|---|---|---|
+| `admin` | `admin123` | ADMIN |
+| `cajero` | `cajero123` | CAJERO |
+| `cliente` | `cliente123` | CLIENTE |
+
 Verificación rápida de la seguridad (con la app corriendo):
 
 ```bash
-curl -i http://localhost:8080/public/hola      # 200 OK (público)
-curl -i http://localhost:8080/api/productos     # 401 Unauthorized (protegido)
+curl -i http://localhost:8080/public/hola                      # 200 OK (público)
+curl -i http://localhost:8080/api/productos                     # 401 (protegido)
+curl -i -u cliente:cliente123 http://localhost:8080/api/productos  # 200 + enlaces HATEOAS
 ```
+
+## Documentación de la API (OpenAPI + HATEOAS)
+
+Con la aplicación corriendo:
+
+- **Swagger UI:** http://localhost:8080/swagger-ui.html
+- **Contrato OpenAPI (JSON):** http://localhost:8080/v3/api-docs — también exportado en [`docs/openapi.json`](docs/openapi.json) (importable en Postman).
+
+Las respuestas incluyen enlaces hipermedia (`_links`) generados con Spring HATEOAS. Ver ejemplo en [`docs/ejemplo-hateoas-productos.json`](docs/ejemplo-hateoas-productos.json).
 
 ## Pruebas y reportes
 

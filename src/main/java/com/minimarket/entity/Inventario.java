@@ -17,7 +17,7 @@ public class Inventario {
     private Integer cantidad;
 
     @Column(nullable = false)
-    private String tipoMovimiento; // Ejemplo: "Entrada" o "Salida"
+    private String tipoMovimiento; 
 
     @Column(nullable = false)
     private Date fechaMovimiento;

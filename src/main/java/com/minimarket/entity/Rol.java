@@ -1,5 +1,6 @@
 package com.minimarket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Set;
 
@@ -12,8 +13,13 @@ public class Rol {
     @Column(nullable = false, unique = true)
     private String nombre;
 
+    @JsonIgnore // Evita recursión infinita Usuario <-> Rol en el JSON
     @ManyToMany(mappedBy = "roles")
     private Set<Usuario> usuarios;
+
+    // Constructor por defecto requerido por JPA/Hibernate
+    public Rol() {
+    }
 
     public Rol(String nombre) {
         this.nombre = nombre;

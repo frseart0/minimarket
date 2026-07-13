@@ -27,6 +27,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/public/**").permitAll() // Acceso público
 
+                        // Documentacion OpenAPI / Swagger UI de acceso público
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**"
+                        ).permitAll()
+
                         // Gestión de usuarios: solo ADMIN
                         .requestMatchers("/api/usuarios/**").hasAuthority("ADMIN")
 

@@ -1,5 +1,6 @@
 package com.minimarket.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.util.Set;
 
@@ -12,6 +13,8 @@ public class Usuario {
     @Column(nullable = false, unique = true)
     private String username;
 
+    // La contraseña se puede recibir (POST) pero nunca se expone en las respuestas
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String password;
 
