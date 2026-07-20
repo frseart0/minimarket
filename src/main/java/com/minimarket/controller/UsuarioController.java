@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -65,7 +66,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "403", description = "Sin permisos (se requiere ADMIN)")
     })
     @PostMapping
-    public EntityModel<Usuario> guardarUsuario(@RequestBody Usuario usuario) {
+    public EntityModel<Usuario> guardarUsuario(@Valid @RequestBody Usuario usuario) {
         return toModel(usuarioService.save(usuario));
     }
 
@@ -75,7 +76,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<Usuario>> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+    public ResponseEntity<EntityModel<Usuario>> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody Usuario usuario) {
         Optional<Usuario> usuarioExistente = usuarioService.findById(id);
         if (usuarioExistente.isPresent()) {
             usuario.setId(id);

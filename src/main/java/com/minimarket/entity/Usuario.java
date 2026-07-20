@@ -2,6 +2,7 @@ package com.minimarket.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Set;
 
 @Entity
@@ -10,10 +11,12 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre de usuario es obligatorio")
     @Column(nullable = false, unique = true)
     private String username;
 
     // La contraseña se puede recibir (POST) pero nunca se expone en las respuestas
+    @NotBlank(message = "La contraseña es obligatoria")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String password;

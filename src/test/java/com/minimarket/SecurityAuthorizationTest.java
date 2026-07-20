@@ -8,7 +8,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,16 +86,16 @@ class SecurityAuthorizationTest {
 
     @Test
     @WithMockUser(username = "cajero", authorities = {"CAJERO"})
-    void cajeroEstaAutorizadoAGenerarVentas() {
+    void cajeroEstaAutorizadoAGenerarVentas() throws Exception {
         // El cajero SÍ supera el control de acceso: la petición alcanza el controlador.
-        // Con un cuerpo incompleto el dominio lanza un error de integridad, lo que
-        // confirma que la autorización fue concedida (no se bloqueó con 403).
-        Exception ex = assertThrows(Exception.class, () ->
-                mockMvc.perform(post("/api/ventas")
+        // Con un cuerpo incompleto (sin usuario) el GlobalExceptionHandler devuelve un
+        // error de negocio/servidor (no 403), lo que confirma que la autorización fue concedida.
+        mockMvc.perform(post("/api/ventas")
                         .contentType("application/json")
-                        .content("{}")));
-        assertFalse(ex.toString().contains("AccessDenied"),
-                "El cajero no debe ser bloqueado por control de acceso");
+                        .content("{}"))
+                .andExpect(result -> assertFalse(
+                        result.getResponse().getStatus() == 403,
+                        "El cajero no debe ser bloqueado por control de acceso"));
     }
 
     // ---------- Usuarios ----------

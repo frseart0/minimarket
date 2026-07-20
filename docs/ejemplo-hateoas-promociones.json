@@ -1,0 +1,37 @@
+{
+    "_embedded": {
+        "promocionList": [
+            {
+                "id": 1,
+                "nombre": "Descuento de lanzamiento",
+                "descripcion": "Descuento especial por tiempo limitado",
+                "porcentajeDescuento": 15.0,
+                "producto": {
+                    "id": 3,
+                    "nombre": "Arroz 1kg",
+                    "precio": 1290.0,
+                    "stock": 40,
+                    "categoria": {
+                        "id": 2,
+                        "nombre": "Abarrotes"
+                    }
+                },
+                "fechaInicio": "2026-07-19T23:35:26.983+00:00",
+                "fechaFin": "2026-08-19T23:35:26.983+00:00",
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/promociones/1"
+                    },
+                    "promociones": {
+                        "href": "http://localhost:8080/api/promociones"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/api/promociones"
+        }
+    }
+}

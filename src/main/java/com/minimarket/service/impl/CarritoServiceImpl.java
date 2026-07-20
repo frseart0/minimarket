@@ -1,6 +1,7 @@
 package com.minimarket.service.impl;
 
 import com.minimarket.entity.Carrito;
+import com.minimarket.exception.ResourceNotFoundException;
 import com.minimarket.repository.CarritoRepository;
 import com.minimarket.service.CarritoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Override
     public Carrito findById(Long id) {
-        return carritoRepository.findById(id).orElse(null);
+        return carritoRepository.findById(id)
+                .orElseThrow(() -> ResourceNotFoundException.forEntity("Ítem de carrito", id));
     }
 
     @Override

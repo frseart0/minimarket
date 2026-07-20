@@ -6,12 +6,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,18 +56,22 @@ public class InventarioController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Inventario>> obtenerMovimientoPorId(@PathVariable Long id) {
-        Inventario inventario = inventarioService.findById(id);
-        return (inventario != null) ? ResponseEntity.ok(toModel(inventario)) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(toModel(inventarioService.findById(id)));
     }
 
     @Operation(summary = "Registrar movimiento de inventario",
-            description = "Registra una entrada o salida de stock asociada a un producto.")
+            description = "Registra una entrada o salida de stock de un producto en una sucursal. "
+                    + "Si la salida deja el stock de la sucursal en el nivel mínimo o por debajo, "
+                    + "se genera automáticamente una orden de compra de reposición.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Movimiento registrado"),
             @ApiResponse(responseCode = "403", description = "Sin permisos (ADMIN o CAJERO)")
     })
     @PostMapping
-    public EntityModel<Inventario> registrarMovimiento(@RequestBody Inventario inventario) {
+    public EntityModel<Inventario> registrarMovimiento(@Valid @RequestBody Inventario inventario) {
+        if (inventario.getFechaMovimiento() == null) {
+            inventario.setFechaMovimiento(new Date());
+        }
         return toModel(inventarioService.save(inventario));
     }
 
@@ -75,13 +81,10 @@ public class InventarioController {
             @ApiResponse(responseCode = "404", description = "Movimiento no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<Inventario>> actualizarMovimiento(@PathVariable Long id, @RequestBody Inventario inventario) {
-        Inventario existente = inventarioService.findById(id);
-        if (existente != null) {
-            inventario.setId(id);
-            return ResponseEntity.ok(toModel(inventarioService.save(inventario)));
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<EntityModel<Inventario>> actualizarMovimiento(@PathVariable Long id, @Valid @RequestBody Inventario inventario) {
+        inventarioService.findById(id);
+        inventario.setId(id);
+        return ResponseEntity.ok(toModel(inventarioService.save(inventario)));
     }
 
     @Operation(summary = "Eliminar movimiento de inventario")
@@ -91,11 +94,8 @@ public class InventarioController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarMovimiento(@PathVariable Long id) {
-        Inventario inventario = inventarioService.findById(id);
-        if (inventario != null) {
-            inventarioService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        inventarioService.findById(id);
+        inventarioService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

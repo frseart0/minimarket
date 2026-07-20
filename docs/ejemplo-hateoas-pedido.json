@@ -1,0 +1,61 @@
+{
+    "_embedded": {
+        "pedidoList": [
+            {
+                "id": 1,
+                "usuario": {
+                    "id": 3,
+                    "username": "cliente",
+                    "roles": [
+                        {
+                            "id": 3,
+                            "nombre": "CLIENTE"
+                        }
+                    ]
+                },
+                "sucursal": {
+                    "id": 2,
+                    "nombre": "Sucursal Las Condes",
+                    "direccion": "Av. Apoquindo 4500",
+                    "comuna": "Las Condes",
+                    "telefono": "+56 2 2000 0000"
+                },
+                "tipoEntrega": "DESPACHO_DOMICILIO",
+                "direccionEntrega": "Los Alerces 123, Las Condes",
+                "estado": "PENDIENTE",
+                "fecha": "2026-07-19T23:38:13.608+00:00",
+                "detalles": [
+                    {
+                        "id": 1,
+                        "producto": {
+                            "id": 1,
+                            "nombre": "Agua mineral 500ml",
+                            "precio": 990.0,
+                            "stock": 50,
+                            "categoria": {
+                                "id": 1,
+                                "nombre": "Bebidas"
+                            }
+                        },
+                        "cantidad": 3,
+                        "precioUnitario": 990.0,
+                        "subtotal": 2970.0
+                    }
+                ],
+                "_links": {
+                    "self": {
+                        "href": "http://localhost:8080/api/pedidos/1"
+                    },
+                    "pedidos": {
+                        "href": "http://localhost:8080/api/pedidos"
+                    }
+                }
+            }
+        ]
+    },
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/api/pedidos/mis-pedidos"
+        }
+    }
+}

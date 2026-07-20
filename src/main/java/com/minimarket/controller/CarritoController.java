@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -53,8 +54,7 @@ public class CarritoController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Carrito>> obtenerCarritoPorId(@PathVariable Long id) {
-        Carrito carrito = carritoService.findById(id);
-        return (carrito != null) ? ResponseEntity.ok(toModel(carrito)) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(toModel(carritoService.findById(id)));
     }
 
     @Operation(summary = "Agregar producto al carrito",
@@ -64,7 +64,7 @@ public class CarritoController {
             @ApiResponse(responseCode = "403", description = "Sin permisos")
     })
     @PostMapping
-    public EntityModel<Carrito> agregarProductoAlCarrito(@RequestBody Carrito carrito) {
+    public EntityModel<Carrito> agregarProductoAlCarrito(@Valid @RequestBody Carrito carrito) {
         return toModel(carritoService.save(carrito));
     }
 
@@ -74,13 +74,10 @@ public class CarritoController {
             @ApiResponse(responseCode = "404", description = "Ítem no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<Carrito>> actualizarCarrito(@PathVariable Long id, @RequestBody Carrito carrito) {
-        Carrito existente = carritoService.findById(id);
-        if (existente != null) {
-            carrito.setId(id);
-            return ResponseEntity.ok(toModel(carritoService.save(carrito)));
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<EntityModel<Carrito>> actualizarCarrito(@PathVariable Long id, @Valid @RequestBody Carrito carrito) {
+        carritoService.findById(id);
+        carrito.setId(id);
+        return ResponseEntity.ok(toModel(carritoService.save(carrito)));
     }
 
     @Operation(summary = "Eliminar producto del carrito")
@@ -90,11 +87,8 @@ public class CarritoController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProductoDelCarrito(@PathVariable Long id) {
-        Carrito carrito = carritoService.findById(id);
-        if (carrito != null) {
-            carritoService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        carritoService.findById(id);
+        carritoService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

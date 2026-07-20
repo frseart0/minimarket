@@ -1,7 +1,9 @@
 package com.minimarket.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 @Entity
 public class DetalleVenta {
@@ -9,18 +11,26 @@ public class DetalleVenta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore // Evita recursión infinita Venta <-> DetalleVenta en el JSON
+    // Se puede enviar al crear el detalle (POST), pero no se serializa de vuelta:
+    // evita la recursión infinita Venta <-> DetalleVenta en la respuesta JSON.
+    @NotNull(message = "La venta es obligatoria")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne
     @JoinColumn(name = "venta_id", nullable = false)
     private Venta venta;
 
+    @NotNull(message = "El producto es obligatorio")
     @ManyToOne
     @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
 
+    @NotNull(message = "La cantidad es obligatoria")
+    @Positive(message = "La cantidad debe ser mayor a cero")
     @Column(nullable = false)
     private Integer cantidad;
 
+    @NotNull(message = "El precio es obligatorio")
+    @Positive(message = "El precio debe ser mayor a cero")
     @Column(nullable = false)
     private Double precio;
 

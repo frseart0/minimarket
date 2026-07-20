@@ -1,6 +1,7 @@
 package com.minimarket.service.impl;
 
 import com.minimarket.entity.DetalleVenta;
+import com.minimarket.exception.ResourceNotFoundException;
 import com.minimarket.repository.DetalleVentaRepository;
 import com.minimarket.service.DetalleVentaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ public class DetalleVentaServiceImpl implements DetalleVentaService {
 
     @Override
     public DetalleVenta findById(Long id) {
-        return detalleVentaRepository.findById(id).orElse(null);
+        return detalleVentaRepository.findById(id)
+                .orElseThrow(() -> ResourceNotFoundException.forEntity("Detalle de venta", id));
     }
 
     @Override

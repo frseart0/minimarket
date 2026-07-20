@@ -1,11 +1,14 @@
 package com.minimarket.controller;
 
 import com.minimarket.entity.Producto;
+import com.minimarket.entity.StockSucursal;
 import com.minimarket.service.ProductoService;
+import com.minimarket.service.StockSucursalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -25,6 +28,9 @@ public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
+
+    @Autowired
+    private StockSucursalService stockSucursalService;
 
     /** Construye la representación HATEOAS de un producto con sus enlaces. */
     private EntityModel<Producto> toModel(Producto producto) {
@@ -54,8 +60,26 @@ public class ProductoController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<EntityModel<Producto>> obtenerProductoPorId(@PathVariable Long id) {
-        Producto producto = productoService.findById(id);
-        return (producto != null) ? ResponseEntity.ok(toModel(producto)) : ResponseEntity.notFound().build();
+        return ResponseEntity.ok(toModel(productoService.findById(id)));
+    }
+
+    @Operation(summary = "Consultar disponibilidad por sucursal",
+            description = "Devuelve el stock del producto en cada sucursal, para que un cliente pueda "
+                    + "verificar en qué tiendas hay unidades disponibles antes de retirar o pedir despacho.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Disponibilidad obtenida correctamente"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    })
+    @GetMapping("/{id}/disponibilidad")
+    public CollectionModel<EntityModel<StockSucursal>> consultarDisponibilidad(@PathVariable Long id) {
+        productoService.findById(id); // valida que el producto exista
+        List<EntityModel<StockSucursal>> disponibilidad = stockSucursalService.findByProductoId(id).stream()
+                .map(stock -> EntityModel.of(stock,
+                        linkTo(methodOn(StockSucursalController.class).obtenerStockPorId(stock.getId())).withSelfRel()))
+                .collect(Collectors.toList());
+        return CollectionModel.of(disponibilidad,
+                linkTo(methodOn(ProductoController.class).consultarDisponibilidad(id)).withSelfRel(),
+                linkTo(methodOn(ProductoController.class).obtenerProductoPorId(id)).withRel("producto"));
     }
 
     @Operation(summary = "Crear producto", description = "Registra un nuevo producto. Requiere rol ADMIN.")
@@ -64,7 +88,7 @@ public class ProductoController {
             @ApiResponse(responseCode = "403", description = "Sin permisos (se requiere ADMIN)")
     })
     @PostMapping
-    public EntityModel<Producto> guardarProducto(@RequestBody Producto producto) {
+    public EntityModel<Producto> guardarProducto(@Valid @RequestBody Producto producto) {
         return toModel(productoService.save(producto));
     }
 
@@ -74,13 +98,10 @@ public class ProductoController {
             @ApiResponse(responseCode = "404", description = "Producto no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<Producto>> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
-        Producto productoExistente = productoService.findById(id);
-        if (productoExistente != null) {
-            producto.setId(id);
-            return ResponseEntity.ok(toModel(productoService.save(producto)));
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<EntityModel<Producto>> actualizarProducto(@PathVariable Long id, @Valid @RequestBody Producto producto) {
+        productoService.findById(id); // lanza ResourceNotFoundException si no existe
+        producto.setId(id);
+        return ResponseEntity.ok(toModel(productoService.save(producto)));
     }
 
     @Operation(summary = "Eliminar producto", description = "Elimina un producto por ID. Requiere rol ADMIN.")
@@ -90,11 +111,8 @@ public class ProductoController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
-        Producto producto = productoService.findById(id);
-        if (producto != null) {
-            productoService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        productoService.findById(id); // lanza ResourceNotFoundException si no existe
+        productoService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

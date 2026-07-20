@@ -1,6 +1,7 @@
 package com.minimarket.service.impl;
 
 import com.minimarket.entity.Categoria;
+import com.minimarket.exception.ResourceNotFoundException;
 import com.minimarket.repository.CategoriaRepository;
 import com.minimarket.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,8 @@ public class CategoriaServiceImpl implements CategoriaService {
 
     @Override
     public Categoria findById(Long id) {
-        return categoriaRepository.findById(id).orElse(null);
+        return categoriaRepository.findById(id)
+                .orElseThrow(() -> ResourceNotFoundException.forEntity("Categoría", id));
     }
 
     @Override

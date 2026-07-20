@@ -1,0 +1,17 @@
+{
+    "token": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIkFETUlOIl0sImlhdCI6MTc4NDUwNDMxNSwiZXhwIjoxNzg0NTA3OTE1fQ.RkLIMVTZxbjni_X8gjBHttlBDtvoMfEwQngrHC0FnwiiSvGm0pZjBO6o5FQ2jO7N",
+    "tipo": "Bearer",
+    "username": "admin",
+    "roles": [
+        "ADMIN"
+    ],
+    "expiraEnMs": 3600000,
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/auth/login"
+        },
+        "productos": {
+            "href": "http://localhost:8080/api/productos"
+        }
+    }
+}
